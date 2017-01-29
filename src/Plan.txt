@@ -1,0 +1,59 @@
+#Building and testing an elevator system.
+Primarily hypothesis is that weighting lifts wait at specific locations during the day (based on predicted peak destinations) will increase efficiency
+
+
+
+
+##Layers
+1. Elevators. 
+    Elevators respond to internal button presses and external signals. pick up people (up to a max) and unload. Real world monitors location with external signals (floor and door switches)
+2. Elevator Control System (ECS). 
+    Handles external symbols and the elevators. Will also factor in weighting to location
+3. Usage Model.
+    Model of users, turning up, waiting and going places
+
+1&2 form the Elevator System, which could use real world external signals. The 3rd Layer is a testing model layer which replaces that for test purposes
+
+
+##Details
+
+1. Elevator
+
+Moves to location of user ender floor(s), stopping to pick up waiting signals (if in the right direction) on the way
+Once at last floor (furthest in direction of travel), signal to ECS. Will either wait till new user signal (default) or be directed to location - Signal comes from ECS. Possible case where hits endpoint and user immediately redirects to new point. will reject ECS direction if so.
+
+
+
+
+
+2. ECS
+
+Monitor user signals on all floors. When triggered these are broadcast to all, but remain active until a elevator consumes them directly (incase it receives the signal first but is slower to the destination). 
+
+
+
+3. Usage Model
+
+Realtime. Model people turning up in the morning 9am (G), going to floor of work (Random distribution 0-6). Either go out for lunch or go to cafe (and come back) then go home at 5pm
+
+
+## Example Floor
+
+6
+---
+5
+---
+4
+---
+3 - Cafe (Peak Lunch Time Destination)
+---
+2
+---
+1
+---
+G - Entrace/Exit
+
+
+
+
+    

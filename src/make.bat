@@ -1,0 +1,1 @@
+for %%i in (*.erl) do erlc %%i || EXIT /B 1
