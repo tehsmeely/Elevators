@@ -16,7 +16,7 @@ init(ParentPid) ->
 
 
 standby(ParentPid) ->
-	io:format("Motor ~p. Standby2~n", [self()]),
+	io:format("Motor ~p. Standing by~n", [self()]),
 	receive
 		{move, Direction} ->
 			io:format("Motor ~p. starting to move in direction ~p~n", [self(), Direction]),
@@ -27,6 +27,7 @@ standby(ParentPid) ->
 	end.
 
 move(ParentPid, Direction) ->
+	io:format("Motor ~p. Moving ~p~n", [self(), Direction]),
 	receive
 		{cancel, Why} ->
 			io:format("Motor ~p was moving. Received cancel for reason: ~p~n", [self(), Why]),

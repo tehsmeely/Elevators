@@ -63,8 +63,8 @@ init([]) ->
         Restart, Shutdown, worker, [elevator_control_server]},
     ElevatorSupervisor = {'Elevator Supervisor', {elevator_supervisor, start_link, []},
         Restart, Shutdown, supervisor, [elevator_supervisor]},
-    TimeServer = {'Elevator Control Server', {elevator_control_server, start_link, []},
-        Restart, Shutdown, worker, [elevator_control_server]},
+    TimeServer = {'Time Server', {timing_server, start_link, []},
+        Restart, Shutdown, worker, [timing_server]},
     io:format("Starting Elevators Parent Supervisor~n", []),
 
     {ok, {SupFlags, [ECS, ElevatorSupervisor, TimeServer]}}.

@@ -1,7 +1,7 @@
 -module(elevator_control_server).
 %% gen_server_mini_template
 -behaviour(gen_server).
--export([start_link/0, register_elevator/1,user_call/2, stopped_at_floor/2]).
+-export([start_link/0, register_elevator/1,user_call/2, stopped_at_floor/2, check_pending/2]).
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
 	 terminate/2, code_change/3]).
@@ -29,14 +29,16 @@ user_call(Floor, Direction) ->
 stopped_at_floor(Floor, Direction) ->
 	gen_server:cast(?SERVER, {stopped_at_floor, {Floor, Direction}}).
 
+check_pending(Floor, Direction) ->
+	gen_server:call(?SERVER, {check_pending, {Floor, Direction}}).
 
 %%% Gen_server Callbacks
 
 handle_call({register_elevator, Pid}, _From, State) ->
-	io:format("Registering elevator with PID ~p~n", [Pid]),
+	io:format("ECS: Registering elevator with PID ~p~n", [Pid]),
 	{reply, ok, State#state{elevators = [Pid|State#state.elevators]} };
 handle_call({user_call, {Floor, Direction}}, _From, State) ->
-	io:format("User call from floor ~p Direction ~p~n", [Floor, Direction]),
+	io:format("ECS: User call from floor ~p Direction ~p~n", [Floor, Direction]),
 	if 
 		Direction == up ->
 			NewState = State#state{pending_up=ordsets:add_element(Floor, State#state.pending_up)};
@@ -45,6 +47,16 @@ handle_call({user_call, {Floor, Direction}}, _From, State) ->
 	end,
 	broadcast_call(NewState, Floor, Direction),
 	{reply, ok, NewState};
+handle_call({check_pending, {Floor, Direction}}, _From, State) -> 
+	io:format("ECS: Elevator checking if pending at floor ~p Direction ~p~n", [Floor, Direction]),
+	if 
+		Direction == up ->
+			Resp = ordsets:is_element(Floor, State#state.pending_up);
+		true ->
+			Resp = ordsets:is_element(Floor, State#state.pending_down)
+	end,
+	io:format("ECS: Answer is ~p~n", [Resp]),
+	{reply, Resp, State};
 
 handle_call(_Request, _From, State) -> {reply, ok, State}.
 
