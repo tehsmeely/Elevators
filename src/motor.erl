@@ -4,7 +4,7 @@
 
 -export([start/1]).
 
--define(TRAVEL_TIME, 3000). %3seconds
+-define(TRAVEL_TIME, 1500). %3seconds
 
 
 start(ParentPid) ->
