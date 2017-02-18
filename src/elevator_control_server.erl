@@ -2,8 +2,8 @@
 %% gen_server_mini_template
 -behaviour(gen_server).
 -export([start_link/0, register_elevator/3,user_call/2,user_call_cancel/2,
-	stopped_at_floor/1, elevator_local_destination/2,
-elevator_local_destination_cancel/2]).
+	stopped_at_floor/1, elevator_local_destination/2, get_elevators/0,
+	elevator_local_destination_cancel/2]).
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
 	 terminate/2, code_change/3]).
@@ -41,12 +41,16 @@ elevator_local_destination(ElevatorName, Floor) ->
 elevator_local_destination_cancel(ElevatorName, Floor) ->
 	gen_server:call(?SERVER, {local_destination_cancel, {ElevatorName, Floor}}). 
 
+
+get_elevators() ->
+	gen_server:call(?SERVER, {get_elevators}). 
+
 %%% Gen_server Callbacks
 
 handle_call({register_elevator, {Name, Pid, ElevatorState}}, _From, State) ->
 	io:format("ECS: Registering elevator with PID ~p~n", [Pid]),
 	NewElevators = dict:store(Name, Pid, State#state.elevators),
-	NewElevatorStates = dict:store(Pid, ElevatorState, State#state.elevators),
+	NewElevatorStates = dict:store(Pid, ElevatorState, State#state.elevatorStates),
 	{reply, ok, State#state{elevators=NewElevators, elevatorStates=NewElevatorStates}};
 handle_call({user_call, {Floor, Direction}}, _From, State) ->
 	io:format("ECS: User call from floor ~p Direction ~p~n", [Floor, Direction]),
@@ -71,7 +75,9 @@ handle_call({stopped_at_floor, {ElevatorState}}, {From, _}, OldState) ->
 	Floor = ElevatorState#elevatorState.floor,
 	Direction = ElevatorState#elevatorState.direction,
 	io:format("ECS: Elevator checking if pending at floor ~p Direction ~p; up:~p, down:~p~n", [Floor, Direction, OldState#state.pending_up, OldState#state.pending_down]),
-	State = dict:store(From, ElevatorState, OldState),
+	io:format("dict:store(~p, ~p, ~p),~n", [From, ElevatorState, OldState]),
+	NewStatesDict = dict:store(From, ElevatorState, OldState#state.elevatorStates),
+	State = OldState#state{elevatorStates=NewStatesDict},
 	if 
 		Direction =:= up ->
 			Resp = ordsets:is_element(Floor, State#state.pending_up),
@@ -106,6 +112,7 @@ handle_call({local_destination_cancel, {ElevatorName, Floor}}, _From, State) ->
 	Elevator = dict:fetch(ElevatorName, State#state.elevators),
 	Elevator ! {destination_cxl, local, Floor, ok},
 	{reply, ok, State};
+handle_call({get_elevators}, _From, State) -> {reply, get_values(State#state.elevatorStates), State};
 handle_call(_Request, _From, State) -> {reply, ok, State}.
 
 handle_cast(_Msg, State) -> {noreply, State}.
@@ -141,6 +148,7 @@ get_closest_valid([], {ClosestElevator, _}, _CallDetails) ->
 get_closest_valid([{Pid, ElevatorState}|L], {ClosestElevator, ClosestDistance}, {Floor, Direction}) ->
 	%% IF direction of elevator matches button direction or is none:
 	%	check the distance and replace if distance is shorter then loop
+	io:format("ecs:get_closest_valid([{~p, ~p}|~p], {~p, ~p}, {~p, ~p})~n", [Pid, ElevatorState,L , ClosestElevator, ClosestDistance, Floor, Direction]),
 	Distance = get_distance(Floor, ElevatorState#elevatorState.floor),
 	if ClosestDistance == -1 ->
 		case lists:member(ElevatorState#elevatorState.direction, [Direction, none]) of
@@ -169,3 +177,10 @@ get_distance(Floor, EFloor) ->
 		true ->
 			-D
 	end.
+
+get_values(Dict) ->
+	get_values(dict:to_list(Dict), []).
+get_values([], Accum) ->
+	lists:reverse(Accum);
+get_values([{_Key, Value}|L], Accum) ->
+	get_values(L, [Value|Accum]).

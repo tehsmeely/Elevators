@@ -27,7 +27,7 @@ server_loop(Socket) ->
 			io:format("External msg received: ~p~n", [M]),
 			Msgs = decode_multi(list_to_binary(Data)),
 			io:format("DecodedMsg: ~p~n", [Msgs]),
-			interface_server:received_ext_msgs(Msgs),
+			interface_server:received_ext_msgs(Msgs, self()),
 			%reenable active_once
 			inet:setopts(Socket, [{active, once}]),
 			server_loop(Socket);

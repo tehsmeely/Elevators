@@ -6,9 +6,11 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
 	 terminate/2, code_change/3]).
 
--export([register_client/1, unregister_client/1,status_update/1, received_ext_msgs/1]).
+-export([register_client/1, unregister_client/1,status_update/1, received_ext_msgs/2]).
 
 -define(SERVER, ?MODULE).
+
+-include("states.hrl").
 
 -record(state, {
 	tcpClients = sets:new()
@@ -27,11 +29,11 @@ unregister_client(ClientPid) ->
 status_update(UpdateMessage) ->
 	gen_server:cast(?SERVER, {status_update, UpdateMessage}).
 
-received_ext_msgs(Msgs) ->
+received_ext_msgs(Msgs, From) ->
 	% Messages received from client(s)
-	lists:foreach(fun(Msg) -> external_message(Msg) end, Msgs).
-external_message(Msg) ->
-	gen_server:cast(?SERVER, {external_message, Msg}).
+	lists:foreach(fun(Msg) -> external_message(Msg, From) end, Msgs).
+external_message(Msg, From) ->
+	gen_server:cast(?SERVER, {external_message, {Msg, From}}).
 
 
 handle_call(_Request, _From, State) -> {reply, aReply, State}.
@@ -41,10 +43,11 @@ handle_cast({register_client, ClientPid}, State) ->
 	{noreply, State#state{tcpClients=sets:add_element(ClientPid, State#state.tcpClients)}};
 handle_cast({unregister_client, ClientPid}, State) -> 
 	{noreply, State#state{tcpClients=sets:del_element(ClientPid, State#state.tcpClients)}};
-handle_cast({external_message, Msg}, State) -> 
+handle_cast({external_message, {Msg, From} }, State) -> 
 	io:format("External Message: ~p~n", [Msg]),
 	MsgList = string:tokens(binary_to_list(Msg), ","),
-	handle_external_message(MsgList),
+	io:format("External Message, List: ~p~n", [MsgList]),
+	handle_external_message(MsgList, From),
 	{noreply, State};
 handle_cast({status_update, UpdateMessage}, State) -> 
 	send_update(UpdateMessage, State),
@@ -68,11 +71,18 @@ send_update(UpdateMessage, State) ->
 	case UpdateMessage of
 		{elevator, Number, Position, Direction} ->
 			send_to_all(State#state.tcpClients, io_lib:format("E,~p,~p,~p",[Number, Position, Direction]) );
+
 		{floor_consumed, Floor, Direction} ->
-			send_to_all(State#state.tcpClients, io_lib:format("FC,~p,~p",[Floor, Direction]) )
+			send_to_all(State#state.tcpClients, io_lib:format("FC,~p,~p",[Floor, Direction]) );
+
+		{temporary_stop, ElevatorNum} ->
+			send_to_all(State#state.tcpClients, io_lib:format("TS,~p",[ElevatorNum]) );
+
+		{temporary_stop_end, ElevatorNum} ->
+			send_to_all(State#state.tcpClients, io_lib:format("TSE,~p",[ElevatorNum]) )
 	end.
 
-handle_external_message(["CALL"|L]) ->
+handle_external_message(["CALL"|L], _From) ->
 	[Floor, Direction, Status] = L,
 	{FloorInt, _} = string:to_integer(Floor),
 	if 
@@ -80,9 +90,8 @@ handle_external_message(["CALL"|L]) ->
 			elevator_control_server:user_call(FloorInt, list_to_atom(Direction) );
 		true ->
 			elevator_control_server:user_call_cancel(FloorInt, list_to_atom(Direction))
-	end,
-	ok;
-handle_external_message(["INTERNAL_BUTTON"|L]) ->
+	end;
+handle_external_message(["INTERNAL_BUTTON"|L], _From) ->
 	[Elevator, Floor, Status] = L, 
 	{ElevatorNum, _} = string:to_integer(Elevator),
 	{FloorNum, _} = string:to_integer(Floor),
@@ -91,7 +100,17 @@ handle_external_message(["INTERNAL_BUTTON"|L]) ->
 			elevator_control_server:elevator_local_destination(ElevatorNum, FloorNum);
 		true ->
 			elevator_control_server:elevator_local_destination_cancel(ElevatorNum, FloorNum)
-	end,
-	ok;
-handle_external_message(_L) ->
-	ok.
+	end;
+handle_external_message(["INIT_ME"], From) ->
+	io:format("INIT request received from: ~p~n", [From]),
+	lists:foreach(
+		fun(Elevator) -> 
+			Number = Elevator#elevatorState.number,
+			Position = Elevator#elevatorState.floor,
+			Direction = Elevator#elevatorState.direction,
+			SendString = io_lib:format("E,~p,~p,~p",[Number, Position, Direction]),
+			io:format("INIT sending: ~p~n", [SendString]),
+			From ! {internal, SendString}
+		end,
+		elevator_control_server:get_elevators()
+	).

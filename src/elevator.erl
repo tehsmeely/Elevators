@@ -60,21 +60,22 @@ moving(State) ->
 			interface_server:status_update({elevator, UpdState#elevatorState.number, NewFloor, UpdState#elevatorState.direction}),
 			case Behaviour of
 				local_end ->
-					stationary(UpdState#elevatorState{direction=none});
+					temporary_stop(UpdState#elevatorState{direction=none}, stop);
+					%stationary();
 				local_end_reverse ->
-					temporary_stop(UpdState#elevatorState{direction=invert_direction(UpdState#elevatorState.direction)}),
-					UpdState#elevatorState.motor ! {move, UpdState#elevatorState.direction},
-					moving(UpdState);
+					temporary_stop(UpdState#elevatorState{direction=invert_direction(UpdState#elevatorState.direction)}, move);
+					% UpdState#elevatorState.motor ! {move, UpdState#elevatorState.direction},
+					% moving(UpdState);
 				temp_stop ->
-					temporary_stop(UpdState),
-					UpdState#elevatorState.motor ! {move, UpdState#elevatorState.direction},
-					moving(UpdState);
+					temporary_stop(UpdState, move);
+					% UpdState#elevatorState.motor ! {move, UpdState#elevatorState.direction},
+					% moving(UpdState);
 				dont_stop ->		
 					io:format("Elevator ~p: Resignalling motor to continue ~p~n", [self(), State#elevatorState.direction]),
 					State#elevatorState.motor ! {move, State#elevatorState.direction},
 					moving(UpdState)
 			end;
-		{destination, local, D, _} ->
+		{destination, _, D, _} ->
 			io:format("Elevator ~p: Received local destination addition ~p~n", [self(), D]),
 			moving(State#elevatorState{floorDestinations=lists:sort([D|State#elevatorState.floorDestinations])});
 		Any ->
@@ -83,26 +84,34 @@ moving(State) ->
 	end. 	
 
 
-temporary_stop(State) ->
-	
+temporary_stop(State, EndMode) ->
+	interface_server:status_update({temporary_stop, State#elevatorState.number}),
 	Ref = timing_server:create_timer(?STOP_DELAY, {lift_move, now}),
-	temporary_stop_wait(State, Ref).
+	temporary_stop_wait(State, Ref, EndMode).
 
-temporary_stop_wait(State, Tref) ->
+temporary_stop_wait(State, Tref, EndMode) ->
 	receive
 		{passengers, N} = M ->
 			io:format("Elevator ~p: Received passenger adjustment ~p~n", [self(), M]),
-			temporary_stop_wait(State#elevatorState{passengers=passengers+N}, Tref);
+			temporary_stop_wait(State#elevatorState{passengers=passengers+N}, Tref, EndMode);
 		{local_button, close} ->
 			ok;
 		{local_button, open} ->
 			timing_server:update_timer(Tref, ?STOP_DELAY),
-			temporary_stop_wait(State, Tref);
+			temporary_stop_wait(State, Tref, EndMode);
 		{destination, local, D, _} ->
 			io:format("Elevator ~p: Received local destination addition ~p~n", [self(), D]),
-			temporary_stop_wait(State#elevatorState{floorDestinations=lists:sort([D|State#elevatorState.floorDestinations])}, Tref);
+			temporary_stop_wait(State#elevatorState{floorDestinations=lists:sort([D|State#elevatorState.floorDestinations])}, Tref, EndMode);
 		{lift_move, now} ->
 			ok
+	end,
+	interface_server:status_update({temporary_stop_end, State#elevatorState.number}),
+	case EndMode of
+		move ->
+			State#elevatorState.motor ! {move, State#elevatorState.direction},
+			moving(State);
+		stop ->
+			stationary(State)
 	end.
 
 
