@@ -60,7 +60,7 @@ init([]) ->
     Shutdown = 2000,
     Type = worker,
 
-    ElevatorChildren = [{gen_name(elevator, I), {elevator, start, [I]},
+    ElevatorChildren = [{gen_name(elevator, I), {elevator, start, [I, self()]},
 	      Restart, Shutdown, Type, [elevator]} || I <- lists:seq(1, 3)],
 
     {ok, {SupFlags, ElevatorChildren}}.

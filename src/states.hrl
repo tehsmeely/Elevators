@@ -6,6 +6,7 @@
 		floorDestinations	=	[]	,
 		direction					,
 		motor						,
-		number
+		number						,
+		parent
 	}
 ).

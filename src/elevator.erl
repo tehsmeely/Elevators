@@ -1,6 +1,6 @@
 -module(elevator).
 
--export([start/1]).
+-export([start/2]).
 
 -export([end_of_direction/3]).
 
@@ -14,43 +14,70 @@
 % }).
 -include("states.hrl").
 
--define(STOP_DELAY, 4000).
+%-define(STOP_DELAY, 4000).
+-define(STOP_DELAY, 4). % 4 ticks = 28s
 
 
-start(N) ->
-	Pid = spawn_link(fun() -> init(N) end),
+start(N, ParentPid) ->
+	Pid = spawn_link(fun() -> init(N, ParentPid) end),
 	{ok, Pid}.	
 
 
-init(Number) ->
+init(Number, ParentPid) ->
 	{ok, Motor} = motor:start(self()),
-	State = #elevatorState{motor=Motor, direction=none, number=Number},
+	State = #elevatorState{motor=Motor, direction=none, number=Number, parent=ParentPid},
 	elevator_control_server:register_elevator(Number, self(), State),
 	stationary(State).
 
+reset(State) ->
+	%resets elevator on request. kill motor and re-call init/2
+	motor:kill(State#elevatorState.motor),
+	Number = State#elevatorState.number,
+	ParentPid = State#elevatorState.parent,
+	init(Number, ParentPid).
 
 stationary(State) ->
 	io:format("Elevator ~p: Stationary ~p~n", [self(), State]),
+	case elevator_control_server:stationary_check(State) of
+		{true, Floor} ->
+			self() ! {destination, remote, Floor, ok};
+		{false, _} -> 
+			ok
+	end,
+	stationary_wait(State).
+
+stationary_wait(State) ->
+	elevator_control_server:update_state(self(), State),
 	receive
 		{destination, _, D, _} = M ->  %local or ECS destination entry
 			io:format("Elevator ~p: Received destination message ~p~n", [self(), M]),
 			if 
 				State#elevatorState.floor =:= D ->
-					io:format("Elevator ~p, Floor entered is same as current, staying still~n",[self()]),
-					stationary(State);
+					io:format("Elevator ~p, Floor entered is same as current, telling ECS then staying still~n",[self()]),
+					elevator_control_server:stopped_at_floor(State),
+					stationary_wait(State);
 				true ->
 					Direction = destinationDirection(State#elevatorState.floor, D),
 					io:format("Elevator ~p, Moving to floor ~p, direction ~p~n",[self(), D, Direction]),
 					State#elevatorState.motor ! {move, Direction},
 					moving(State#elevatorState{floorDestinations=[D], direction=Direction})
 			end;
+		{check_ping, From, TickID} ->
+			From ! {elevator_ok, self(), TickID},
+			stationary_wait(State);
+		restart ->
+			reset(State);
+		print_state ->
+			print_state("stationary_wait", State),
+			stationary_wait(State);
 		Any -> 
 			io:format("Elevator ~p: Received unknown message ~p~n", [self(), Any]),
-			stationary(State)
+			stationary_wait(State)
 	end. 
 
 moving(State) ->
 	io:format("Elevator ~p: Moving ~p~n", [self(), State]),
+	elevator_control_server:update_state(self(), State),
 	receive
 		{motor, next_floor, _} = M ->
 			io:format("Elevator ~p: Received position update ~p~n", [self(), M]),
@@ -77,7 +104,16 @@ moving(State) ->
 			end;
 		{destination, _, D, _} ->
 			io:format("Elevator ~p: Received local destination addition ~p~n", [self(), D]),
-			moving(State#elevatorState{floorDestinations=lists:sort([D|State#elevatorState.floorDestinations])});
+			NewDestList = add_to_destinations(State#elevatorState.floorDestinations, D),
+			moving(State#elevatorState{floorDestinations=NewDestList});
+		{check_ping, From, TickID} ->
+			From ! {elevator_ok, self(), TickID},
+			moving(State);
+		restart ->
+			reset(State);
+		print_state ->
+			print_state("moving", State),
+			moving(State);
 		Any ->
 			io:format("Elevator ~p: Received unknown message ~p~n", [self(), Any]),
 			moving(State)
@@ -85,15 +121,16 @@ moving(State) ->
 
 
 temporary_stop(State, EndMode) ->
-	interface_server:status_update({temporary_stop, State#elevatorState.number}),
+	interface_server:status_update({temporary_stop, State#elevatorState.number, State#elevatorState.direction}),
 	Ref = timing_server:create_timer(?STOP_DELAY, {lift_move, now}),
 	temporary_stop_wait(State, Ref, EndMode).
 
 temporary_stop_wait(State, Tref, EndMode) ->
+	elevator_control_server:update_state(self(), State),
 	receive
-		{passengers, N} = M ->
-			io:format("Elevator ~p: Received passenger adjustment ~p~n", [self(), M]),
-			temporary_stop_wait(State#elevatorState{passengers=passengers+N}, Tref, EndMode);
+	% 	{passengers, N} = M ->
+	% 		io:format("Elevator ~p: Received passenger adjustment ~p~n", [self(), M]),
+	% 		temporary_stop_wait(State#elevatorState{passengers=passengers+N}, Tref, EndMode);
 		{local_button, close} ->
 			ok;
 		{local_button, open} ->
@@ -101,7 +138,28 @@ temporary_stop_wait(State, Tref, EndMode) ->
 			temporary_stop_wait(State, Tref, EndMode);
 		{destination, local, D, _} ->
 			io:format("Elevator ~p: Received local destination addition ~p~n", [self(), D]),
-			temporary_stop_wait(State#elevatorState{floorDestinations=lists:sort([D|State#elevatorState.floorDestinations])}, Tref, EndMode);
+			NewDestList = add_to_destinations(State#elevatorState.floorDestinations, D),
+			%if endmode was 'stop', need to change it to move but then reloop as usual!
+			if EndMode =:= move; State#elevatorState.direction =/= none ->
+				%no change
+				NewState = State#elevatorState{floorDestinations=NewDestList};
+			% true when State#elevatorState.direction =/= none ->
+			% 	%dont change the direction if set
+			% 	NewState = State#elevatorState{floorDestinations=NewDestList};
+			true ->
+				%pick the direction from here to dest, set it and reloop
+				NewDir = destinationDirection(State#elevatorState.floor, D),
+				NewState = State#elevatorState{floorDestinations=NewDestList, direction=NewDir}
+			end,
+			temporary_stop_wait(NewState, Tref, move);
+		{check_ping, From, TickID} ->
+			From ! {elevator_ok, self(), TickID},
+			temporary_stop_wait(State, Tref, EndMode);
+		restart ->
+			reset(State);
+		print_state ->
+			print_state("temporary_stop_wait", State),
+			temporary_stop_wait(State, Tref, EndMode);
 		{lift_move, now} ->
 			ok
 	end,
@@ -111,10 +169,8 @@ temporary_stop_wait(State, Tref, EndMode) ->
 			State#elevatorState.motor ! {move, State#elevatorState.direction},
 			moving(State);
 		stop ->
-			stationary(State)
+			stationary(State#elevatorState{direction=none})
 	end.
-
-
 
 %%% INTERNAL FUNCTIONS
 destinationDirection(Current, Dest) ->
@@ -152,9 +208,9 @@ check_floor_behaviour(OldState, NewFloor) ->
 				_ ->
 					case end_of_direction(NewFloor, NewDestinations, State#elevatorState.direction) of
 						true ->
-							RetVal = temp_stop;  %c
+							RetVal = local_end_reverse;  %b
 						_ ->
-							RetVal = local_end_reverse %b
+							RetVal = temp_stop %c
 					end
 			end,
 			NewState = State#elevatorState{floorDestinations=NewDestinations};
@@ -174,10 +230,10 @@ check_floor_behaviour(OldState, NewFloor) ->
 end_of_direction(Floor, Destinations, Direction) ->
 	%use direction to ascertain if NewFloor is end of current direction in floorDestinations
 	case Direction of
-		up -> %NewFloor is end if greater than max of remaining
-			Floor > lists:max(Destinations);
-		down -> %NewFloor is enf if less than min of remaining
-			Floor < lists:min(Destinations)
+		up -> %NewFloor is end if greaterthan/equal max of remaining
+			Floor >= lists:max(Destinations);
+		down -> %NewFloor is end if lessthan/equal min of remaining
+			Floor =< lists:min(Destinations)
 	end.
 
 
@@ -187,6 +243,28 @@ invert_direction(Direction) ->
 		down -> up
 	end.
 
+
+add_to_destinations(DestList, D) ->
+	case lists:member(D, DestList) of
+		true -> DestList;
+		false -> lists:sort([D|DestList])
+	end.
+
+
+
+print_state(Mode, State) ->
+	io:format("Elevator ~p in mode~p, state:~nfloor: ~p~npassengers: ~p~nfloorDestinations: ~p~ndirection: ~p~nmotor: ~p~nparent: ~p~n",
+		[
+			State#elevatorState.number,
+			Mode,
+			State#elevatorState.floor,
+			State#elevatorState.passengers,
+			State#elevatorState.floorDestinations,
+			State#elevatorState.direction,
+			State#elevatorState.motor,
+			State#elevatorState.parent
+		]
+	).
 
 %%  States
 %%------------------

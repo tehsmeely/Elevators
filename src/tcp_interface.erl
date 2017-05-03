@@ -18,10 +18,10 @@ parallel_connection_listen(Listen) ->
 
 server_loop(Socket) ->
 	receive
-		{internal, Msg}=M -> 
-			io:format("Internal msg received: ~p~n", [M]),
-			S = gen_tcp:send(Socket, netstring:encode(Msg)),
-			io:format("send: ~p~n", [S]),
+		{internal, Msg} -> 
+			%io:format("Internal msg received: ~p~n", [M]),
+			gen_tcp:send(Socket, netstring:encode(Msg)),
+			%io:format("send: ~p~n", [S]),
 			server_loop(Socket);
 		{tcp, Socket, Data}=M ->
 			io:format("External msg received: ~p~n", [M]),

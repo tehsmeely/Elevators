@@ -4,16 +4,108 @@
 		"selected_items":
 		[
 			[
-				"g",
-				"get_values"
+				"Mo",
+				"MotorPid"
 			],
 			[
-				"ele",
-				"elevator"
+				"kill",
+				"Killer"
+			],
+			[
+				"M",
+				"MotorPid"
+			],
+			[
+				"New",
+				"NewDir"
 			],
 			[
 				"Ele",
-				"Elevator"
+				"ElevatorState"
+			],
+			[
+				"Dis",
+				"Distance"
+			],
+			[
+				"T",
+				"TickID"
+			],
+			[
+				"c",
+				"currentTickID"
+			],
+			[
+				"lis",
+				"list_join"
+			],
+			[
+				"send",
+				"send_to_all_but"
+			],
+			[
+				"Di",
+				"Distance"
+			],
+			[
+				"C",
+				"ClosestDistance"
+			],
+			[
+				"Clo",
+				"ClosestDistance"
+			],
+			[
+				"ele",
+				"elevatorState"
+			],
+			[
+				"el",
+				"elevatorState"
+			],
+			[
+				"De",
+				"DestList"
+			],
+			[
+				"N",
+				"NewCurrentTick"
+			],
+			[
+				"cue",
+				"currentDuration"
+			],
+			[
+				"Sta",
+				"StartTime"
+			],
+			[
+				"Ti",
+				"TimerRecord"
+			],
+			[
+				"stat",
+				"startTime"
+			],
+			[
+				"curr",
+				"currentTick"
+			],
+			[
+				"cu",
+				"currentTick"
+			],
+			[
+				"pi",
+				"ping_response_count"
+			],
+			[
+				"check",
+				"check_ping_all"
+			],
+			[
+				"g",
+				"get_values"
 			],
 			[
 				"S",
@@ -56,10 +148,6 @@
 				"direction"
 			],
 			[
-				"New",
-				"NewFloor"
-			],
-			[
 				"upd",
 				"update_timer"
 			],
@@ -70,10 +158,6 @@
 			[
 				"timer",
 				"timer_end"
-			],
-			[
-				"Di",
-				"Duration"
 			],
 			[
 				"Ex",
@@ -368,10 +452,6 @@
 				"GRID_COLOURS"
 			],
 			[
-				"cu",
-				"currentGrid"
-			],
-			[
 				"cr",
 				"currentGrid"
 			],
@@ -434,86 +514,6 @@
 			[
 				"sp",
 				"spriteHandler"
-			],
-			[
-				"sprite",
-				"SpriteHandler"
-			],
-			[
-				"scr",
-				"screenDims"
-			],
-			[
-				"option",
-				"optionVal"
-			],
-			[
-				"op",
-				"optionVal"
-			],
-			[
-				"rep",
-				"replaceButton"
-			],
-			[
-				"add",
-				"addButton"
-			],
-			[
-				"re",
-				"replaceButton"
-			],
-			[
-				"wid",
-				"widget"
-			],
-			[
-				"ac",
-				"actionInfo"
-			],
-			[
-				"new",
-				"newFilePath"
-			],
-			[
-				"input",
-				"inputMaxima"
-			],
-			[
-				"dat",
-				"dataFile"
-			],
-			[
-				"ti",
-				"timeData"
-			],
-			[
-				"DA",
-				"DATAFILE_TIME_FORMAT"
-			],
-			[
-				"plot",
-				"plotName"
-			],
-			[
-				"raw",
-				"rawdata"
-			],
-			[
-				"r",
-				"rawdata"
-			],
-			[
-				"x",
-				"x_data"
-			],
-			[
-				"data",
-				"dataFile"
-			],
-			[
-				"load",
-				"loadFile"
 			]
 		]
 	},
@@ -532,7 +532,7 @@
 			"file": "src/elevator_supervisor.erl",
 			"settings":
 			{
-				"buffer_size": 2326,
+				"buffer_size": 2334,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -541,7 +541,7 @@
 			"file": "src/elevator_control_server.erl",
 			"settings":
 			{
-				"buffer_size": 6991,
+				"buffer_size": 11118,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -559,44 +559,17 @@
 			"file": "src/timing_server.erl",
 			"settings":
 			{
-				"buffer_size": 2580,
+				"buffer_size": 4500,
 				"encoding": "UTF-8",
 				"line_ending": "Windows",
 				"name": "-module(timing_server)."
 			}
 		},
 		{
-			"file": "src/elevators.app.src",
-			"settings":
-			{
-				"buffer_size": 267,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
 			"file": "src/elevator.erl",
 			"settings":
 			{
-				"buffer_size": 6651,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/states.hrl",
-			"settings":
-			{
-				"buffer_size": 194,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/Plan.txt",
-			"settings":
-			{
-				"buffer_size": 2346,
+				"buffer_size": 9355,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -605,16 +578,35 @@
 			"file": "src/motor.erl",
 			"settings":
 			{
-				"buffer_size": 836,
+				"buffer_size": 1805,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/states.hrl",
+			"settings":
+			{
+				"buffer_size": 210,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/helper_lib.erl",
+			"settings":
+			{
+				"buffer_size": 223,
+				"encoding": "UTF-8",
+				"line_ending": "Windows",
+				"name": "-module(helper_lib)."
 			}
 		},
 		{
 			"file": "src/tcp_interface.erl",
 			"settings":
 			{
-				"buffer_size": 1267,
+				"buffer_size": 1263,
 				"encoding": "UTF-8",
 				"line_ending": "Windows",
 				"name": "-module(tcp_interface)."
@@ -624,10 +616,19 @@
 			"file": "src/interface_server.erl",
 			"settings":
 			{
-				"buffer_size": 3957,
+				"buffer_size": 5679,
 				"encoding": "UTF-8",
 				"line_ending": "Windows",
 				"name": "-module(interface_server)."
+			}
+		},
+		{
+			"file": "src/Plan.txt",
+			"settings":
+			{
+				"buffer_size": 2346,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
 			}
 		}
 	],
@@ -772,15 +773,16 @@
 	"expanded_folders":
 	[
 		"/D/Library/Documents/Erlang/Elevators",
-		"/D/Library/Documents/Erlang/Elevators/_build",
-		"/D/Library/Documents/Erlang/Elevators/_build/default",
-		"/D/Library/Documents/Erlang/Elevators/_build/default/lib",
-		"/D/Library/Documents/Erlang/Elevators/_build/default/lib/netstring",
-		"/D/Library/Documents/Erlang/Elevators/py",
 		"/D/Library/Documents/Erlang/Elevators/src"
 	],
 	"file_history":
 	[
+		"/D/Library/Documents/Erlang/Elevators/startall.bat",
+		"/D/Library/Documents/Erlang/test_server.erl",
+		"/D/Library/Documents/Erlang/Elevators/src/elevators.app.src",
+		"/D/Library/Documents/FTB/FTBLauncherLog.txt",
+		"/D/Library/Documents/FTB/MinecraftLog.txt",
+		"/D/Library/Documents/ellie",
 		"/D/Library/Documents/Filmstosee.txt",
 		"/D/Library/Documents/Erlang/Elevators/elevators.sublime-project",
 		"/D/Library/Documents/Erlang/Elevators/rebar.lock",
@@ -902,13 +904,7 @@
 		"/D/Program Files/GIMP 2/share/gimp/2.0/scripts/simple-unsharp-mask.scm",
 		"/D/Library/Documents/My Received Files/smelly__feet3779066395/History/helen-x-dryden3522912076.xml",
 		"/C/users/jonty/appdata/local/temp/sublime-sftp-browse-1466591195/HomeBox/home/pi/node/monServe/db/users.js",
-		"/C/users/jonty/appdata/local/temp/sublime-sftp-browse-1466544335/HomeBox/home/pi/node/monServe/server.js",
-		"/C/users/jonty/appdata/local/temp/sublime-sftp-browse-1466541291/HomeBox/home/pi/node/testapp/app.js",
-		"/D/Library/Dropbox/py/ARPG/editor/data/enemies/enemies.xml",
-		"/D/Library/Dropbox/py/ARPG/editor/data/components/components.xml",
-		"/D/Library/Dropbox/py/ARPG/editor/levels/level0/room1.xml",
-		"/D/Library/Dropbox/py/ARPG/editor/levels/level0/room2.xml",
-		"/D/Library/Dropbox/py/ARPG/editor/levels/level0/room3.xml"
+		"/C/users/jonty/appdata/local/temp/sublime-sftp-browse-1466544335/HomeBox/home/pi/node/monServe/server.js"
 	],
 	"find":
 	{
@@ -928,6 +924,13 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"temporary_stop",
+			"check_ping",
+			"{elevator,",
+			"get_val",
+			"ERROR",
+			"ERROr",
+			"ERRPR",
 			"#state",
 			"stopped_at_floor",
 			",\n",
@@ -1048,14 +1051,7 @@
 			">\n",
 			" \">",
 			"margin",
-			"%\">",
-			">\n",
-			"id='ordify'",
-			"ordify",
-			"True",
-			"notifyAll",
-			"updateUserEventStatus",
-			"if session.get('logged_in', 0):\n\t\tlogin = (1, session.get('username', \"NAMENOTFOUND\"))\n\telse:\n\t\tlogin = (0, None)"
+			"%\">"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1128,7 +1124,7 @@
 	"groups":
 	[
 		{
-			"selected": 11,
+			"selected": 4,
 			"sheets":
 			[
 				{
@@ -1150,13 +1146,15 @@
 						],
 						"settings":
 						{
+							"remote_loading": false,
+							"synced": false,
 							"syntax": "Packages/Erlang/Erlang.sublime-syntax"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 9,
 					"type": "text"
 				},
 				{
@@ -1165,19 +1163,22 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2326,
+						"buffer_size": 2334,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1416,
-								1416
+								1871,
+								1871
 							]
 						],
 						"settings":
 						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
 							"syntax": "Packages/Erlang/Erlang.sublime-syntax",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
@@ -1186,7 +1187,7 @@
 						"translation.y": 379.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
@@ -1195,27 +1196,30 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6991,
+						"buffer_size": 11118,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								228,
-								228
+								5655,
+								5664
 							]
 						],
 						"settings":
 						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
 							"syntax": "Packages/Erlang/Erlang.sublime-syntax",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 594.0,
+						"translation.y": 2421.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
@@ -1237,15 +1241,17 @@
 						],
 						"settings":
 						{
+							"remote_loading": false,
+							"synced": false,
 							"syntax": "Packages/Erlang/Erlang.sublime-syntax",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 685.0,
+						"translation.y": 415.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 10,
+					"stack_index": 8,
 					"type": "text"
 				},
 				{
@@ -1254,87 +1260,95 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2580,
+						"buffer_size": 4500,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1443,
-								1443
+								166,
+								166
 							]
 						],
 						"settings":
 						{
 							"auto_name": "-module(timing_server).",
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
 							"syntax": "Packages/Erlang/Erlang.sublime-syntax",
 							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 270.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 11,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "src/elevators.app.src",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 267,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								267,
-								267
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Erlang/Erlang.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 5,
 					"file": "src/elevator.erl",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6651,
+						"buffer_size": 9355,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3023,
-								3023
+								5897,
+								5897
 							]
 						],
 						"settings":
 						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
 							"syntax": "Packages/Erlang/Erlang.sublime-syntax",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1053.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "src/motor.erl",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1805,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								437,
+								437
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Erlang/Erlang.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 54.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
@@ -1343,20 +1357,24 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 194,
+						"buffer_size": 210,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								71,
-								81
+								167,
+								172
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Erlang/Erlang.sublime-syntax"
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Erlang/Erlang.sublime-syntax",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1367,53 +1385,58 @@
 				},
 				{
 					"buffer": 8,
-					"file": "src/Plan.txt",
+					"file": "src/helper_lib.erl",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2346,
+						"buffer_size": 223,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1745,
-								1745
+								46,
+								46
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/MarkdownEditing/Markdown.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"auto_name": "-module(helper_lib).",
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Erlang/Erlang.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 1258.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
+					"stack_index": 11,
 					"type": "text"
 				},
 				{
 					"buffer": 9,
-					"file": "src/motor.erl",
+					"file": "src/tcp_interface.erl",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 836,
+						"buffer_size": 1263,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								63,
-								63
+								868,
+								868
 							]
 						],
 						"settings":
 						{
+							"auto_name": "-module(tcp_interface).",
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
 							"syntax": "Packages/Erlang/Erlang.sublime-syntax",
 							"translate_tabs_to_spaces": false
 						},
@@ -1426,29 +1449,32 @@
 				},
 				{
 					"buffer": 10,
-					"file": "src/tcp_interface.erl",
+					"file": "src/interface_server.erl",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1267,
+						"buffer_size": 5679,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								815,
-								832
+								5623,
+								5587
 							]
 						],
 						"settings":
 						{
-							"auto_name": "-module(tcp_interface).",
+							"auto_name": "-module(interface_server).",
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
 							"syntax": "Packages/Erlang/Erlang.sublime-syntax",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2053.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
@@ -1456,32 +1482,34 @@
 				},
 				{
 					"buffer": 11,
-					"file": "src/interface_server.erl",
+					"file": "src/Plan.txt",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3957,
+						"buffer_size": 2346,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2897,
-								2897
+								1793,
+								1793
 							]
 						],
 						"settings":
 						{
-							"auto_name": "-module(interface_server).",
-							"syntax": "Packages/Erlang/Erlang.sublime-syntax",
-							"translate_tabs_to_spaces": false
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/MarkdownEditing/Markdown.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1395.0,
+						"translation.y": 2266.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 10,
 					"type": "text"
 				}
 			]
